@@ -1,7 +1,7 @@
 package assn02;
-import java.util.Scanner;
 
-class transIndex {
+import java.util.Scanner;
+class transaction {
     String date;
     String time;
     String category;
@@ -9,106 +9,97 @@ class transIndex {
     int quantity;
     double rating;
     int duration;
-    public transIndex(String input) {
-        date = input.substring(0, input.indexOf(" "));
-        input = input.substring(input.indexOf(" ") + 1);
-        time = input.substring(0, input.indexOf(" "));
-        input = input.substring(input.indexOf(" ") + 1);
-        category = input.substring(0, input.indexOf(" "));
-        input = input.substring(input.indexOf(" ") + 1);
-        price = Double.parseDouble(input.substring(0, input.indexOf(" ")));
-        input = input.substring(input.indexOf(" ") + 1);
-        quantity = Integer.parseInt(input.substring(0, input.indexOf(" ")));
-        input = input.substring(input.indexOf(" ") + 1);
-        rating = Double.parseDouble(input.substring(0, input.indexOf(" ")));
-        input = input.substring(input.indexOf(" ") + 1);
-        duration = Integer.parseInt(input);
+    public transaction(String line){
+        String[] attr = line.split(" ");
+        date = attr[0];
+        time = attr[1];
+        category = attr[2];
+        price = Double.parseDouble(attr[3]);
+        quantity = Integer.parseInt(attr[4]);
+        rating = Double.parseDouble(attr[5]);
+        duration = Integer.parseInt(attr[6]);
     }
-    public static transIndex[] tArray(Scanner input){
-        int size = Integer.parseInt(input.nextLine());
-        transIndex[] df = new transIndex[size];
-        for (int i = 0; i < size; i++){
-            String elt = input.nextLine();
-            df[i] = new transIndex(elt);
+    public static transaction[] entries(Scanner insert){
+        int len = Integer.parseInt(insert.nextLine());
+        transaction[] all = new transaction[len];
+        int i = 0;
+        while(i < len){
+            String next = insert.nextLine();
+            all[i] = new transaction(next);
+            i++;
         }
-        return df;
+        return all;
     }
 }
-
 public class JavaWarmUp {
-
-        public static void highLow(transIndex ti) {
-            System.out.println("\tWhen: " + ti.date + " " + ti.time);
-            System.out.println("\tCategory: " + ti.category);
-            System.out.println("\tPrice: " + ti.price);
-            System.out.println("\tRating" + ti.quantity);
-        }
-
-        public static void getMaxPrice(transIndex[] dt) {
-            if (dt.length == 1) {
-                System.out.println("Highest per unit sale: ");
-                highLow(dt[0]);
-            } else {
-                transIndex max = dt[0];
-                for (int i = 1; i < dt.length; i++) {
-                    if (dt[i].price <= max.price) {
-                        max = dt[i];
-                    }
+    public static void getMaxData(transaction[] data){
+        transaction max = data[0];
+        if(data.length == 1){
+            System.out.println("Lowest per unit sale:");
+        } else {
+            int i = 0;
+            while(i < data.length){
+                if(data[i].price >= max.price){
+                    max = data[i];
                 }
-                System.out.println("Highest per unit sale: ");
-                highLow(max);
+                i++;
             }
+            System.out.println("Highest per unit sale:");
         }
-
-        public static void getMinPrice(transIndex[] dt) {
-            if (dt.length == 1) {
-                System.out.println("Lowest per unit sale: ");
-                highLow(dt[0]);
-            } else {
-                transIndex min = dt[0];
-                for (int i = 1; i < dt.length; i++) {
-                    if (dt[i].price <= min.price) {
-                        min = dt[i];
-                    }
+        System.out.println("\tWhen: " + max.date + " " + max.time);
+        System.out.println("\tCategory: " + max.category);
+        System.out.printf("\tPrice: %.2f", max.price);
+        System.out.println("\n\tRating: " + max.rating);
+    }
+    public static void getMinData(transaction[] data){
+        transaction min = data[0];
+        if(data.length == 1){
+            System.out.println("Lowest per unit sale:");
+        } else {
+            int i = 0;
+            while(i < data.length){
+                if(data[i].price <= min.price){
+                    min = data[i];
                 }
-                System.out.println("Lowest per unit sale: ");
-                highLow(min);
+                i++;
             }
+            System.out.println("Lowest per unit sale:");
         }
-
-        public static void transAvg(transIndex[] dt, String tp) {
-            if (dt.length == 0) {
-                System.out.println("None");
-            } else {
-                int i = 0;
-                int quantity = 0;
-                double price = 0;
-                double rating = 0;
-                double duration = 0;
-                for (transIndex ti : dt) {
-                    if (ti.category.equals(tp)) {
-                        i += 1;
-                        quantity += ti.quantity;
-                        price += ti.price;
-                        rating += ti.rating;
-                        duration += ti.duration;
-                    }
-                }
-                System.out.println("Averages by " + tp);
-                System.out.println("\tQuantity: " + quantity);
-                System.out.printf("\tPrice: %.2f\n", price / quantity);
-                System.out.printf("\tRating: %.2f\n", rating / i);
-                System.out.printf("\tDuration: %.2f\n", duration / i);
+        System.out.println("\tWhen: " + min.date + " " + min.time);
+        System.out.println("\tCategory: " + min.category);
+        System.out.printf("\tPrice: %.2f", min.price);
+        System.out.println("\n\tRating: " + min.rating);
+    }
+    public static void getAvgData(transaction[] data, String cat){
+        int i = 0;
+        int quantity = 0;
+        double price = 0;
+        double rating = 0;
+        double duration = 0;
+        int c = 0;
+        while(c < data.length){
+            if(data[c].category.equals(cat)){
+                i += 1;
+                quantity += data[c].quantity;
+                price += data[c].price * data[c].quantity;
+                rating += data[c].rating;
+                duration += data[c].duration;
             }
+            c++;
         }
-
-        public static void main(String[] args) {
-            Scanner sc = new Scanner(System.in);
-            transIndex[] t = transIndex.tArray(sc);
-            getMaxPrice(t);
-            getMinPrice(t);
-            transAvg(t, "book");
-            transAvg(t, "jewelry");
-            transAvg(t, "phone");
-        }
+        System.out.println("Averages by " + cat);
+        System.out.println("\tQuantity: " + quantity);
+        System.out.printf("\tPrice: %.2f\n", price / quantity);
+        System.out.printf("\tRating: %.2f\n", rating / i);
+        System.out.printf("\tDuration: %.2f\n", duration / i);
+    }
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        transaction[] all_data = transaction.entries(in);
+        getMaxData(all_data);
+        getMinData(all_data);
+        getAvgData(all_data, "book");
+        getAvgData(all_data, "jewelry");
+        getAvgData(all_data, "phone");
+    }
 }
